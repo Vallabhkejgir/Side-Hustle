@@ -8,7 +8,7 @@ class ScriptEngine:
     def __init__(self):
         # Requires GEMINI_API_KEY environment variable
         self.client = genai.Client()
-        self.model_id = "gemini-2.5-flash" # Defaulting to latest stable flash
+        self.model_id = "gemini-flash-latest" # Defaulting to latest stable flash
 
     def generate_script(self, topic: str) -> VideoScript:
         """Generates a complete video script and visual prompts based on a topic."""

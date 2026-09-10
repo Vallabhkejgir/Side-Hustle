@@ -8,7 +8,7 @@ class VideoEngine:
     def __init__(self, workspace_dir: str):
         self.workspace_dir = workspace_dir
         self.client = genai.Client()
-        self.model_id = "veo-2.0-generate-001" # Or whichever specific Veo model name is active
+        self.model_id = "veo-3.1-generate-preview" # Or whichever specific Veo model name is active
 
     def generate_video_for_scene(self, scene: Scene, scene_index: int) -> str:
         """Generates video using Veo with non-blocking polling."""
