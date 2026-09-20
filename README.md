@@ -1,14 +1,14 @@
 # Automated YouTube Video Pipeline (Python & Gemini Ecosystem)
 
-This project provides a fully automated, headless video generation and publishing pipeline. Built on Python, the system leverages the Google GenAI SDK to orchestrate scriptwriting, voiceover synthesis, and cinematic video clip generation (via Veo 3.1). Final assembly is handled locally via FFmpeg, with programmatic publishing managed through the YouTube Data API v3.
+This project provides a fully automated, headless video generation and publishing pipeline. Built on Python, the system leverages the Google GenAI SDK to orchestrate scriptwriting, voiceover synthesis, and cinematic video clip generation (via veo-3.1-generate-preview). Final assembly is handled locally via FFmpeg, with programmatic publishing managed through the YouTube Data API v3.
 
 ## System Architecture
 
 The pipeline follows a modular, event-driven architecture designed to decouple AI generation tasks from heavy media processing and API rate-limiting constraints.
 
 *   **Orchestration Layer (`src/main.py`):** Coordinates the workflow, manages state, and handles the ephemeral workspace.
-*   **Cognitive Layer (`src/script_engine.py`):** Gemini 2.5 Flash enforces strict data schemas (via Pydantic) to generate narrative scripts and highly descriptive visual prompts.
-*   **Synthesis Layer (`src/audio_engine.py` & `src/video_engine.py`):** Synthesizes TTS audio per scene and uses Veo 3.1 for high-fidelity video clip generation with asynchronous polling.
+*   **Cognitive Layer (`src/script_engine.py`):** gemini-flash-latest enforces strict data schemas (via Pydantic) to generate narrative scripts and highly descriptive visual prompts.
+*   **Synthesis Layer (`src/audio_engine.py` & `src/video_engine.py`):** Synthesizes TTS audio per scene and uses veo-3.1-generate-preview for high-fidelity video clip generation with asynchronous polling.
 *   **Assembly Layer (`src/assembly_engine.py`):** A local FFmpeg wrapper that concatenates media streams, loops/trims video to match audio durations perfectly, and renders the final output.
 *   **Distribution Layer (`src/youtube_engine.py`):** Uploads the final video to YouTube as a private draft.
 
