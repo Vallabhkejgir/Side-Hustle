@@ -10,7 +10,7 @@ class ScriptEngine:
     def __init__(self):
         # Requires GEMINI_API_KEY environment variable
         self.client = genai.Client()
-        self.model_id = "gemini-flash-latest" # Defaulting to latest stable flash
+        self.model_id = "gemini-flash-latest" # Use gemini-flash-latest as the fallback
 
     @retry(
         stop=stop_after_attempt(5),
