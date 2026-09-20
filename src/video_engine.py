@@ -10,7 +10,7 @@ class VideoEngine:
     def __init__(self, workspace_dir: str):
         self.workspace_dir = workspace_dir
         self.client = genai.Client()
-        self.model_id = "veo-3.1-lite-generate-preview"
+        self.model_id = os.getenv("GEMINI_VIDEO_MODEL", "veo-3.1-lite-generate-preview")
 
     @retry(
         stop=stop_after_attempt(5),

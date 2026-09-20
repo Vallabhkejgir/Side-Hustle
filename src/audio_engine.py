@@ -9,7 +9,7 @@ class AudioEngine:
     def __init__(self, workspace_dir: str):
         self.workspace_dir = workspace_dir
         self.client = genai.Client()
-        self.model_id = "gemini-2.5-flash-preview-tts"
+        self.model_id = os.getenv("GEMINI_AUDIO_MODEL", "gemini-2.5-flash-preview-tts")
 
     @retry(
         stop=stop_after_attempt(5),
