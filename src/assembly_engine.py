@@ -14,8 +14,6 @@ class AssemblyEngine:
         final_output = os.path.join(self.workspace_dir, "final_video.mp4")
         print("Assembling final video...")
 
-        # For each scene, we need to merge the audio and video, ensuring the video
-        # matches the audio length.
         processed_clips = []
         for i, media in enumerate(scenes_media):
             audio_path = media.get('audio')
@@ -24,21 +22,40 @@ class AssemblyEngine:
             if not audio_path or not video_path:
                  continue
 
-            # 1. Postprocessing: Get audio duration via ffprobe
-            # duration = self._get_audio_duration(audio_path)
-
-            # 2. Combine and trim video to audio length
             combined_clip_path = os.path.join(self.workspace_dir, f"combined_{i}.mp4")
-
-            # Example FFmpeg command logic to combine, looping video if shorter, trimming to audio length
-            # ffmpeg -stream_loop -1 -i video.mp4 -i audio.mp3 -c:v copy -c:a aac -shortest combined.mp4
             print(f"Combining audio and video for scene {i}...")
 
-            # Mocking the combination for scaffold
-            with open(combined_clip_path, "w") as f:
-                f.write("mock combined data")
+            # Use FFmpeg to combine video and audio.
+            # -stream_loop -1 loops the video infinitely.
+            # -shortest stops encoding when the shortest stream (the audio) ends.
+            # -c:v copy copies the video stream without re-encoding (if possible)
+            # -c:a aac encodes audio to standard AAC.
+            # -fflags +shortest -max_interleave_delta 100M helps prevent sync issues when looping.
+            
+            cmd = [
+                "ffmpeg",
+                "-y", # Overwrite if exists
+                "-stream_loop", "-1", # Loop the video
+                "-i", video_path,
+                "-i", audio_path,
+                "-c:v", "libx264", # Re-encode video to ensure consistent format for concatenation
+                "-c:a", "aac",
+                "-b:a", "192k",
+                "-pix_fmt", "yuv420p",
+                "-shortest",
+                combined_clip_path
+            ]
+            
+            try:
+                subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+                processed_clips.append(combined_clip_path)
+                print(f"Successfully processed scene {i}")
+            except subprocess.CalledProcessError as e:
+                print(f"FFmpeg failed for scene {i}: {e.stderr.decode('utf-8', errors='ignore')}")
+                continue
 
-            processed_clips.append(combined_clip_path)
+        if not processed_clips:
+            raise Exception("No scenes were successfully processed.")
 
         # 3. Concatenate all combined clips sequentially
         manifest_path = os.path.join(self.workspace_dir, "manifest.txt")
@@ -47,15 +64,22 @@ class AssemblyEngine:
                   f.write(f"file '{clip}'\n")
 
         print("Concatenating scenes via FFmpeg...")
-        # Example FFmpeg command: ffmpeg -f concat -safe 0 -i manifest.txt -c copy final_video.mp4
-
-        # Mocking final output
-        with open(final_output, "w") as f:
-             f.write("mock final video data")
+        # FFmpeg command to concatenate
+        concat_cmd = [
+            "ffmpeg",
+            "-y",
+            "-f", "concat",
+            "-safe", "0",
+            "-i", manifest_path,
+            "-c", "copy",
+            final_output
+        ]
+        
+        try:
+            subprocess.run(concat_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+            print("Successfully concatenated final video!")
+        except subprocess.CalledProcessError as e:
+            print(f"FFmpeg concatenation failed: {e.stderr.decode('utf-8', errors='ignore')}")
+            raise Exception("Video concatenation failed.")
 
         return final_output
-
-    def _get_audio_duration(self, audio_path: str) -> float:
-        """Extracts exact audio duration using ffprobe."""
-        # subprocess call to ffprobe
-        return 5.0 # Mock duration
