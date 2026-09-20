@@ -20,16 +20,20 @@ class ScriptEngine:
     )
     def _call_gemini_api(self, prompt: str) -> VideoScript:
         """Wrapper for API call with exponential backoff for 503 ServerError."""
-        print("Calling Gemini API...")
-        response = self.client.models.generate_content(
-            model=self.model_id,
-            contents=prompt,
-            config={
-                "response_mime_type": "application/json",
-                "response_schema": VideoScript,
-            },
-        )
-        
+        print(f"Calling Gemini API (model: {self.model_id}) for Script Generation...")
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_id,
+                contents=prompt,
+                config={
+                    "response_mime_type": "application/json",
+                    "response_schema": VideoScript,
+                },
+            )
+        except Exception as e:
+            print(f"Error during Script Generation API call: {e}")
+            raise
+
         if response.parsed:
              return response.parsed
         else:

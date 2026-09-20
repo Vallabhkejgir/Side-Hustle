@@ -18,16 +18,20 @@ class AudioEngine:
         reraise=True
     )
     def _call_gemini_tts_api(self, text: str):
-        print("Calling Gemini TTS API...")
+        print(f"Calling Gemini API (model: {self.model_id}) for Audio/TTS Generation...")
         from google.genai import types
-        return self.client.models.generate_content(
-            model=self.model_id,
-            contents=text,
-            config=types.GenerateContentConfig(
-                response_modalities=["AUDIO"],
-                speech_config="charon"
+        try:
+            return self.client.models.generate_content(
+                model=self.model_id,
+                contents=text,
+                config=types.GenerateContentConfig(
+                    response_modalities=["AUDIO"],
+                    speech_config="charon"
+                )
             )
-        )
+        except Exception as e:
+            print(f"Error during Audio/TTS Generation API call: {e}")
+            raise
 
     def generate_audio_for_scene(self, scene: Scene, scene_index: int) -> str:
         """Generates audio for a specific scene using Gemini TTS."""

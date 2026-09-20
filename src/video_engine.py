@@ -19,15 +19,19 @@ class VideoEngine:
         reraise=True
     )
     def _call_veo_api(self, prompt: str):
-        print("Calling Veo API...")
+        print(f"Calling Veo API (model: {self.model_id}) for Video Generation...")
         # Removed the unsupported person_generation="allow_adult" argument
-        return self.client.models.generate_videos(
-            model=self.model_id,
-            source={"prompt": prompt},
-            config=types.GenerateVideosConfig(
-                 aspect_ratio="9:16"
+        try:
+            return self.client.models.generate_videos(
+                model=self.model_id,
+                source={"prompt": prompt},
+                config=types.GenerateVideosConfig(
+                     aspect_ratio="9:16"
+                )
             )
-        )
+        except Exception as e:
+            print(f"Error during Video Generation API call: {e}")
+            raise
 
     def generate_video_for_scene(self, scene: Scene, scene_index: int) -> str:
         """Generates video using Veo with non-blocking polling."""
