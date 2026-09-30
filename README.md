@@ -9,13 +9,14 @@ The pipeline follows a modular, event-driven architecture designed to decouple A
 *   **Orchestration Layer (`src/main.py`):** Coordinates the workflow, manages state, and handles the ephemeral workspace.
 *   **Cognitive Layer (`src/script_engine.py`):** gemini-flash-latest enforces strict data schemas (via Pydantic) to generate narrative scripts and highly descriptive visual prompts.
 *   **Synthesis Layer (`src/audio_engine.py` & `src/video_engine.py`):** Synthesizes TTS audio per scene and uses veo-3.1-generate-preview for high-fidelity video clip generation with asynchronous polling.
-*   **Assembly Layer (`src/assembly_engine.py`):** A local FFmpeg wrapper that concatenates media streams, loops/trims video to match audio durations perfectly, and renders the final output.
+*   **Assembly Layer (`src/assembly_engine.py`):** A local FFmpeg wrapper using hardware acceleration (NVIDIA NVENC) to concatenate media streams, loop/trim video to match audio durations perfectly, and render the final output, showing progress in the terminal.
 *   **Distribution Layer (`src/youtube_engine.py`):** Uploads the final video to YouTube as a private draft.
 
 ## Prerequisites
 
 *   Python 3.10+
 *   FFmpeg installed and available in your system `PATH`.
+*   NVIDIA GPU with NVENC support (required for hardware-accelerated encoding).
 *   Google Cloud Console Project with YouTube Data API v3 enabled.
 *   Gemini API Key.
 

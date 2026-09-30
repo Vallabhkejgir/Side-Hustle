@@ -2,6 +2,7 @@ import os
 import subprocess
 from typing import List, Dict
 
+
 class AssemblyEngine:
     def __init__(self, workspace_dir: str):
         self.workspace_dir = workspace_dir
@@ -17,11 +18,11 @@ class AssemblyEngine:
 
         processed_clips = []
         for i, media in enumerate(scenes_media):
-            audio_path = media.get('audio')
-            video_path = media.get('video')
+            audio_path = media.get("audio")
+            video_path = media.get("video")
 
             if not audio_path or not video_path:
-                 continue
+                continue
 
             combined_clip_path = os.path.join(self.workspace_dir, f"combined_{i}.mp4")
             print(f"Combining audio and video for scene {i}...")
@@ -32,19 +33,28 @@ class AssemblyEngine:
             # -c:v h264_nvenc encodes using NVIDIA GPU
             cmd = [
                 "ffmpeg",
-                "-y", # Overwrite if exists
-                "-stream_loop", "-1", # Loop the video
-                "-i", video_path,
-                "-i", audio_path,
-                "-c:v", "h264_nvenc", # Re-encode video using GPU
-                "-preset", "fast",    # NVENC preset
-                "-c:a", "aac",
-                "-b:a", "192k",
-                "-pix_fmt", "yuv420p",
+                "-y",  # Overwrite if exists
+                "-stream_loop",
+                "-1",  # Loop the video
+                "-i",
+                video_path,
+                "-i",
+                audio_path,
+                "-c:v",
+                "h264_nvenc",  # Re-encode video using GPU
+                "-preset",
+                "fast",  # NVENC preset
+                "-c:a",
+                "aac",
+                "-b:a",
+                "192k",
+                "-pix_fmt",
+                "yuv420p",
                 # Normalize resolution and framerate for seamless concatenation
-                "-vf", "scale=1920:1080,fps=30",
+                "-vf",
+                "scale=1920:1080,fps=30",
                 "-shortest",
-                combined_clip_path
+                combined_clip_path,
             ]
 
             try:
@@ -62,19 +72,23 @@ class AssemblyEngine:
         # Concatenate all combined clips sequentially
         manifest_path = os.path.join(self.workspace_dir, "manifest.txt")
         with open(manifest_path, "w") as f:
-             for clip in processed_clips:
-                  f.write(f"file '{clip}'\n")
+            for clip in processed_clips:
+                f.write(f"file '{clip}'\n")
 
         print("\nConcatenating scenes via FFmpeg...")
         # FFmpeg command to concatenate
         concat_cmd = [
             "ffmpeg",
             "-y",
-            "-f", "concat",
-            "-safe", "0",
-            "-i", manifest_path,
-            "-c", "copy",
-            final_output
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            manifest_path,
+            "-c",
+            "copy",
+            final_output,
         ]
 
         try:
