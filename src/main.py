@@ -1,11 +1,15 @@
 import os
 import shutil
 import time
+from dotenv import load_dotenv
 from src.script_engine import ScriptEngine
 from src.audio_engine import AudioEngine
 from src.video_engine import VideoEngine
 from src.assembly_engine import AssemblyEngine
 from src.youtube_engine import YouTubeEngine
+
+load_dotenv()
+
 
 def run_pipeline(topic: str):
     # 1. Initialize Workspace
@@ -29,10 +33,7 @@ def run_pipeline(topic: str):
             audio_path = audio_engine.generate_audio_for_scene(scene, i)
             video_path = video_engine.generate_video_for_scene(scene, i)
 
-            scenes_media.append({
-                 'audio': audio_path,
-                 'video': video_path
-            })
+            scenes_media.append({"audio": audio_path, "video": video_path})
 
         # 5. Media Assembly
         assembly_engine = AssemblyEngine(workspace_dir)
@@ -41,10 +42,10 @@ def run_pipeline(topic: str):
         # 6. Publishing
         youtube_engine = YouTubeEngine()
         youtube_engine.upload_video(
-             final_video_path,
-             title=script.title,
-             description=script.description,
-             tags=script.tags
+            final_video_path,
+            title=script.title,
+            description=script.description,
+            tags=script.tags,
         )
 
     finally:
@@ -52,6 +53,7 @@ def run_pipeline(topic: str):
         print(f"Cleaning up workspace {workspace_dir}...")
         shutil.rmtree(workspace_dir, ignore_errors=True)
         print("Pipeline run complete.")
+
 
 if __name__ == "__main__":
     # Test the pipeline
