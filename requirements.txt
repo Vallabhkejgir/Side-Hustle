@@ -3,4 +3,3 @@ google-api-python-client
 google-auth-oauthlib
 pydantic
 python-dotenv
-modal
