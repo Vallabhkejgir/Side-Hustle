@@ -1,11 +1,14 @@
 import os
 import shutil
 import time
+from dotenv import load_dotenv
 from src.script_engine import ScriptEngine
 from src.audio_engine import AudioEngine
 from src.video_engine import VideoEngine
 from src.assembly_engine import AssemblyEngine
 from src.youtube_engine import YouTubeEngine
+
+load_dotenv()
 
 def run_pipeline(topic: str):
     # 1. Initialize Workspace
